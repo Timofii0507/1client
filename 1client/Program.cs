@@ -2,10 +2,11 @@
 using System.Net;
 using System.Net.Sockets;
 using System.Text;
+using System.Threading.Tasks;
 
 class Client
 {
-    static void Main(string[] args)
+    static async Task Main(string[] args)
     {
         Console.ForegroundColor = ConsoleColor.DarkBlue;
         Console.CursorVisible = false;
@@ -17,21 +18,18 @@ class Client
 
         try
         {
-            sender.Connect(remoteEP);
-
+            await sender.ConnectAsync(remoteEP);
             Console.WriteLine($"Connected to {sender.RemoteEndPoint.ToString()}");
 
-            Console.WriteLine("Enter 'time' to request the current time or 'date' to request the current date:");
-            string request = Console.ReadLine();
-
-            byte[] msg = Encoding.UTF8.GetBytes(request);
-            int bytesSent = sender.Send(msg);
+            string message = "Hello, server!";
+            byte[] msg = Encoding.UTF8.GetBytes(message);
+            await sender.SendAsync(new ArraySegment<byte>(msg), SocketFlags.None);
 
             byte[] bytes = new byte[1024];
-            int bytesRec = sender.Receive(bytes);
+            int bytesRec = await sender.ReceiveAsync(new ArraySegment<byte>(bytes), SocketFlags.None);
             string data = Encoding.UTF8.GetString(bytes, 0, bytesRec);
 
-            Console.WriteLine($"At {DateTime.Now.ToShortTimeString()} received: {data}");
+            Console.WriteLine($"At {DateTime.Now.ToShortTimeString()} received from {((IPEndPoint)sender.RemoteEndPoint).Address}: {data}");
 
             sender.Shutdown(SocketShutdown.Both);
             sender.Close();
