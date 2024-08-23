@@ -21,13 +21,17 @@ class Client
 
             Console.WriteLine($"Connected to {sender.RemoteEndPoint.ToString()}");
 
-            byte[] msg = Encoding.UTF8.GetBytes("Hello, server!");
+            Console.WriteLine("Enter 'time' to request the current time or 'date' to request the current date:");
+            string request = Console.ReadLine();
+
+            byte[] msg = Encoding.UTF8.GetBytes(request);
             int bytesSent = sender.Send(msg);
+
             byte[] bytes = new byte[1024];
             int bytesRec = sender.Receive(bytes);
             string data = Encoding.UTF8.GetString(bytes, 0, bytesRec);
 
-            Console.WriteLine($"At {DateTime.Now.ToShortTimeString()} received from {((IPEndPoint)sender.RemoteEndPoint).Address}: {data}");
+            Console.WriteLine($"At {DateTime.Now.ToShortTimeString()} received: {data}");
 
             sender.Shutdown(SocketShutdown.Both);
             sender.Close();
