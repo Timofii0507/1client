@@ -15,21 +15,23 @@ class Client
         IPEndPoint remoteEP = new IPEndPoint(ipAddress, port);
 
         Socket sender = new Socket(ipAddress.AddressFamily, SocketType.Stream, ProtocolType.Tcp);
-         
+
         try
         {
             await sender.ConnectAsync(remoteEP);
             Console.WriteLine($"Connected to {sender.RemoteEndPoint.ToString()}");
 
-            string message = "Hello, server!";
-            byte[] msg = Encoding.UTF8.GetBytes(message);
+            Console.WriteLine("Enter 'time' to request the current time or 'date' to request the current date:");
+            string request = Console.ReadLine();
+
+            byte[] msg = Encoding.UTF8.GetBytes(request);
             await sender.SendAsync(new ArraySegment<byte>(msg), SocketFlags.None);
 
             byte[] bytes = new byte[1024];
             int bytesRec = await sender.ReceiveAsync(new ArraySegment<byte>(bytes), SocketFlags.None);
             string data = Encoding.UTF8.GetString(bytes, 0, bytesRec);
 
-            Console.WriteLine($"At {DateTime.Now.ToShortTimeString()} received from {((IPEndPoint)sender.RemoteEndPoint).Address}: {data}");
+            Console.WriteLine($"At {DateTime.Now.ToShortTimeString()} received: {data}");
 
             sender.Shutdown(SocketShutdown.Both);
             sender.Close();
