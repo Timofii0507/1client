@@ -15,7 +15,7 @@ class Client
         IPEndPoint remoteEP = new IPEndPoint(ipAddress, port);
 
         Socket sender = new Socket(ipAddress.AddressFamily, SocketType.Stream, ProtocolType.Tcp);
-
+         
         try
         {
             await sender.ConnectAsync(remoteEP);
